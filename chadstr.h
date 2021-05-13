@@ -87,18 +87,11 @@
 typedef struct __cstr
 {
     bool garbage;
-    const size_t len;
-    const char *const data;
-} __cstr;
-typedef __cstr *str;
-
-typedef struct __cstr_mut
-{
-    bool garbage;
     size_t len;
     char * data;
-} __cstr_mut;
-typedef __cstr_mut *str_mut;
+} __cstr;
+typedef __cstr  *str;
+
 
 str __ctos_lev1(char c);                  // char to str
 str __itos_lev1(long long i);            // integers to str
@@ -147,13 +140,13 @@ char *__cpret(size_t num, char* cp, ...);
 str __ctos_lev1(char c)
 {
     size_t len = snprintf(NULL, 0, "%c", c);
-    void *__s = malloc(sizeof(__cstr) + len + 1);
+    str __s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
+
+    __s->garbage = true;
+    __s->len = len;
     snprintf(p, len + 1, "%c", c);
-
-    __cstr __s_init = {.garbage = true, .len = len, .data = p};
-
-    memcpy(__s, &__s_init, sizeof(__cstr));
+    __s->data = p;
 
     return (str)__s;
 }
@@ -161,13 +154,13 @@ str __ctos_lev1(char c)
 str __itos_lev1(long long i)
 {
     size_t len = snprintf(NULL, 0, "%lld", i);
-    void *__s = malloc(sizeof(__cstr) + len + 1);
+    str __s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
+
+    __s->garbage = true;
+    __s->len = len;
     snprintf(p, len + 1, "%lld", i);
-
-    __cstr __s_init = {.garbage = true, .len = len, .data = p};
-
-    memcpy(__s, &__s_init, sizeof(__cstr));
+    __s->data = p;
 
     return (str)__s;
 }
@@ -175,13 +168,13 @@ str __itos_lev1(long long i)
 str __ftos_lev1(double d)
 {
     size_t len = snprintf(NULL, 0, "%f", d);
-    void *__s = malloc(sizeof(__cstr) + len + 1);
+    str __s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
+
+    __s->garbage = true;
+    __s->len = len;
     snprintf(p, len + 1, "%f", d);
-
-    __cstr __s_init = {.garbage = true, .len = len, .data = p};
-
-    memcpy(__s, &__s_init, sizeof(__cstr));
+    __s->data = p;
 
     return (str)__s;
 }
@@ -189,13 +182,13 @@ str __ftos_lev1(double d)
 str __stos_lev1(const char *const s)
 {
     size_t len = snprintf(NULL, 0, "%s", s);
-    void *__s = malloc(sizeof(__cstr) + len + 1);
+    str __s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
+
+    __s->garbage = true;
+    __s->len = len;
     snprintf(p, len + 1, "%s", s);
-
-    __cstr __s_init = {.garbage = true, .len = len, .data = p};
-
-    memcpy(__s, &__s_init, sizeof(__cstr));
+    __s->data = p;
 
     return (str)__s;
 }
