@@ -15,6 +15,14 @@ test2 = test1; // acceptable, but wrong since test2 now points to test1 not copi
 
 str(*test1); // returns char* to use in printf like functions
 Ex: puts(str(*test1)); // prints test1;
+```
+*"Why yes, i don't free(), OS cleans all memory for me, how did you know?"*
 
+<p>
+  <img src="gc.gif" alt="animated" width="250" height="350" />
+</p>
+
+```c
 free(test1); // will free memory for whole str.
 ```
+
