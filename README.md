@@ -1,7 +1,7 @@
 # chadstr.h
 ### Chad Strings - The Chad way to handle strings in C.
 
-One str(...) macro to handle them all.
+One str(...) macro to handle them all. //not completely finished
 
 ### Examples Usage:
 ```c
