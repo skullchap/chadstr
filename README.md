@@ -1,5 +1,5 @@
-# chadstr.h
-### Chad Strings - The Chad way to handle strings in C.
+# CHADSTR.H
+### CHAD STRINGS - The Chad way to handle strings in C.
 
 One ```str(...)``` macro to handle them all.
 
@@ -19,7 +19,7 @@ Ex: puts(str(*test1)); // prints test1;
 *"Why yes, i don't free(), OS cleans all memory for me, how did you know?"*
 
 <p>
-  <img src="gc.gif" alt="animated" width="250" height="350" />
+  <img src="gc.gif" alt="animated" width="250" height="400" />
 </p>
 
 ```c
