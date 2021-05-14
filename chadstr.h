@@ -98,7 +98,8 @@ str __itos_lev1(long long i);            // integers to str
 str __ftos_lev1(double d);              // floats to str
 str __stos_lev1(const char * const s); // char * "strings" to str
 
-str __str__lev1(str __s);            // decoy function to return str
+// str __str__lev1(str __s);            // decoy function to return str
+const char* __str__lev1(str __s);            // decoy function to return str
 str * __pstr_lev1(str *__s);        // return pointer to str
 char* __cstr_lev1(__cstr cstr);
 
@@ -108,6 +109,7 @@ char *__spret(size_t num, str *s, str len, ...); // returns char* to str->data,
 
 str __strNret(size_t num, ...);              // returns final str on multiple str chunks
 char *__cpret(size_t num, char* cp, ...);
+str __cpNret(size_t num, ...);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -130,17 +132,20 @@ char *__cpret(size_t num, char* cp, ...);
 
 #define __lev3(S, ...) _Generic((S),                                    \
     str:                __strNret,      str *:        __spret,          \
-    __cstr:             __spret,        char *:       __cpret           \
+    __cstr:             __spret,        char *:       __cpret,          \
+    const char*:        __cpNret                                        \
 )(PP_NARG(S, ##__VA_ARGS__), S, ##__VA_ARGS__)
 
 #define str(...) __lev3(__lev2(__VA_ARGS__))
+
+#define member_size(type, member) sizeof(((type *)0)->member)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 str __ctos_lev1(char c)
 {
     size_t len = snprintf(NULL, 0, "%c", c);
-    str __s = malloc(sizeof(__cstr) + len + 1);
+    str __s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     __s->garbage = true;
@@ -154,7 +159,7 @@ str __ctos_lev1(char c)
 str __itos_lev1(long long i)
 {
     size_t len = snprintf(NULL, 0, "%lld", i);
-    str __s = malloc(sizeof(__cstr) + len + 1);
+    str __s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     __s->garbage = true;
@@ -168,7 +173,7 @@ str __itos_lev1(long long i)
 str __ftos_lev1(double d)
 {
     size_t len = snprintf(NULL, 0, "%f", d);
-    str __s = malloc(sizeof(__cstr) + len + 1);
+    str __s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     __s->garbage = true;
@@ -182,7 +187,7 @@ str __ftos_lev1(double d)
 str __stos_lev1(const char *const s)
 {
     size_t len = snprintf(NULL, 0, "%s", s);
-    str __s = malloc(sizeof(__cstr) + len + 1);
+    str __s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     __s->garbage = true;
@@ -193,10 +198,15 @@ str __stos_lev1(const char *const s)
     return (str)__s;
 }
 
-str __str__lev1(str __s)
+const char* __str__lev1(str __s)
 {
-    return (str)__s;
+    return (const char*)__s->data;
 }
+
+// str __str__lev1(str __s)
+// {
+//     return __s;
+// }
 
 str *__pstr_lev1(str *__s)
 {
@@ -233,7 +243,7 @@ str __strNret(size_t num, ...)
     }
     va_end(args);
 
-    void *__s = malloc(sizeof(__cstr) + len + 1);
+    str __s = calloc(1, sizeof(__cstr) + len + 1);
     char *temp = (char *)(__s + sizeof(__cstr));
 
     va_start(args, num);
@@ -258,9 +268,9 @@ str __strNret(size_t num, ...)
 
     va_end(args);
 
-    __cstr __s_init = {.garbage = false, .len = len, .data = temp};
-
-    memcpy(__s, &__s_init, sizeof(__cstr));
+    __s->garbage = false;
+    __s->len = len;
+    __s->data = temp;
 
     return (str)__s;
 }
@@ -273,6 +283,43 @@ char *__cstr_lev1(__cstr cstr)
 char *__cpret(size_t num, char *cp, ...)
 {
     return cp;
+}
+
+str __cpNret(size_t num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    size_t len = 0;
+
+    size_t eachlen[128];
+    for (int i = 0; i < num; ++i)
+    {
+        const char *__tmpstr = va_arg(args,  const char *);
+        eachlen[i] = strlen(__tmpstr);
+        len += eachlen[i];
+    }
+    va_end(args);
+
+    str __s = calloc(1, sizeof(__cstr) + len + 1);
+    char *temp = (char *)(__s + sizeof(__cstr));
+
+    va_start(args, num);
+    const char *__tmpstr = va_arg(args,  const char *);
+    strncpy(temp, __tmpstr, eachlen[0]);
+
+    for (int i = 1; i < num; ++i)
+    {
+        __tmpstr = va_arg(args, const char*);
+        strncat(temp, __tmpstr, eachlen[i]);
+  
+    }
+    va_end(args);
+
+    __s->garbage = false;
+    __s->len = len;
+    __s->data = temp;
+
+    return (str)__s;
 }
 
 #endif
