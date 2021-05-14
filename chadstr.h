@@ -132,13 +132,13 @@ const char *__cpNret(size_t num, const char* cp, ...); // returns const char * t
 str __btos_lev1(bool b)
 {
     size_t len = snprintf(NULL, 0, "%s", (b) ? "true" : "false");
-    str __s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
-    __s->garbage = true;
-    __s->len = len;
+    ((str)__s)->garbage = true;
+    ((str)__s)->len = len;
     snprintf(p, len + 1, "%s", (b) ? "true" : "false");
-    __s->data = p;
+    ((str)__s)->data = p;
 
     return (str)__s;
 }
@@ -146,13 +146,13 @@ str __btos_lev1(bool b)
 str __ctos_lev1(char c)
 {
     size_t len = snprintf(NULL, 0, "%c", c);
-    str __s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
-    __s->garbage = true;
-    __s->len = len;
+    ((str)__s)->garbage = true;
+    ((str)__s)->len = len;
     snprintf(p, len + 1, "%c", c);
-    __s->data = p;
+    ((str)__s)->data = p;
 
     return (str)__s;
 }
@@ -160,13 +160,13 @@ str __ctos_lev1(char c)
 str __itos_lev1(long long i)
 {
     size_t len = snprintf(NULL, 0, "%lld", i);
-    str __s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
-    __s->garbage = true;
-    __s->len = len;
+    ((str)__s)->garbage = true;
+    ((str)__s)->len = len;
     snprintf(p, len + 1, "%lld", i);
-    __s->data = p;
+    ((str)__s)->data = p;
 
     return (str)__s;
 }
@@ -174,13 +174,13 @@ str __itos_lev1(long long i)
 str __ftos_lev1(double d)
 {
     size_t len = snprintf(NULL, 0, "%f", d);
-    str __s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
-    __s->garbage = true;
-    __s->len = len;
+    ((str)__s)->garbage = true;
+    ((str)__s)->len = len;
     snprintf(p, len + 1, "%f", d);
-    __s->data = p;
+    ((str)__s)->data = p;
 
     return (str)__s;
 }
@@ -188,10 +188,10 @@ str __ftos_lev1(double d)
 str __stos_lev1(const char *const s)
 {
     size_t len = snprintf(NULL, 0, "%s", s);
-    void* __s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
-    ((str )__s)->garbage = true;
+    ((str)__s)->garbage = true;
     ((str)__s)->len = len;
     snprintf(p, len + 1, "%s", s);
     ((str)__s)->data = p;
@@ -224,7 +224,7 @@ str __strNret(size_t num, ...)
     }
     va_end(args);
 
-    void* __s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = calloc(1, sizeof(__cstr) + len + 1);
     char *temp = (char *)(__s + sizeof(__cstr));
 
     va_start(args, num);
