@@ -188,13 +188,13 @@ str __ftos_lev1(double d)
 str __stos_lev1(const char *const s)
 {
     size_t len = snprintf(NULL, 0, "%s", s);
-    str __s = calloc(1, sizeof(__cstr) + len + 1);
+    void* __s = calloc(1, sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
-    __s->garbage = true;
-    __s->len = len;
+    ((str )__s)->garbage = true;
+    ((str)__s)->len = len;
     snprintf(p, len + 1, "%s", s);
-    __s->data = p;
+    ((str)__s)->data = p;
 
     return (str)__s;
 }
@@ -224,7 +224,7 @@ str __strNret(size_t num, ...)
     }
     va_end(args);
 
-    str __s = calloc(1, sizeof(__cstr) + len + 1);
+    void* __s = calloc(1, sizeof(__cstr) + len + 1);
     char *temp = (char *)(__s + sizeof(__cstr));
 
     va_start(args, num);
@@ -249,9 +249,9 @@ str __strNret(size_t num, ...)
 
     va_end(args);
 
-    __s->garbage = false;
-    __s->len = len;
-    __s->data = temp;
+    ((str)__s)->garbage = false;
+    ((str)__s)->len = len;
+    ((str)__s)->data = temp;
 
     return (str)__s;
 }
