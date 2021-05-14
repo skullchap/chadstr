@@ -92,55 +92,56 @@ typedef struct __cstr
 } __cstr;
 typedef __cstr  *str;
 
+str __btos_lev1(bool b);                     // bool to str
+str __ctos_lev1(char c);                    // char to str
+str __itos_lev1(long long i);              // integers to str
+str __ftos_lev1(double d);                // floats to str
+str __stos_lev1(const char * const s);   // char * "strings" to str
+str __str__lev1(str __s);               // decoy function to return str
+const char* __cstr_lev1(__cstr cstr);  // decoy function to return str.data
 
-str __ctos_lev1(char c);                  // char to str
-str __itos_lev1(long long i);            // integers to str
-str __ftos_lev1(double d);              // floats to str
-str __stos_lev1(const char * const s); // char * "strings" to str
-
-// str __str__lev1(str __s);            // decoy function to return str
-const char* __str__lev1(str __s);            // decoy function to return str
-str * __pstr_lev1(str *__s);        // return pointer to str
-char* __cstr_lev1(__cstr cstr);
-
-char *__spret(size_t num, str *s, str len, ...); // returns char* to str->data, 
-                                                // supposed to be used in str(&teststr, 8192);
-                                               // which return char* to buffer of 8192 bytes.
-
-str __strNret(size_t num, ...);              // returns final str on multiple str chunks
-char *__cpret(size_t num, char* cp, ...);
-str __cpNret(size_t num, ...);
+str __strNret(size_t num, ...);                         // returns final str on multiple str chunks
+const char *__cpNret(size_t num, const char* cp, ...); // returns const char * to .data field of str
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define __lev1(S) _Generic((S),                                         \
-    char:               __ctos_lev1,    unsigned char:  __itos_lev1,    \
-    signed char:        __itos_lev1,    short:          __itos_lev1,    \
-    unsigned short:     __itos_lev1,    int:            __itos_lev1,    \
-    unsigned int:       __itos_lev1,    long:           __itos_lev1,    \
-    unsigned long:      __itos_lev1,    /*size_t:         __itos_lev1,*/\
-    unsigned long long: __itos_lev1,    long long:      __itos_lev1,    \
-    float:              __ftos_lev1,    double:         __ftos_lev1,    \
-    long double:        __ftos_lev1,    void*:           "void ptr",    \
-    const char* const:  __stos_lev1,    char*:          __stos_lev1,    \
-    const char*:        __stos_lev1,    char* const:    __stos_lev1,    \
-    str:                __str__lev1,    str*:           __pstr_lev1,    \
-    __cstr:             __cstr_lev1                                     \
+#define __lev1(S) _Generic((S),         _Bool:              __btos_lev1,    \
+    char:               __ctos_lev1,    unsigned char:      __itos_lev1,    \
+    signed char:        __itos_lev1,    short:              __itos_lev1,    \
+    unsigned short:     __itos_lev1,    int:                __itos_lev1,    \
+    unsigned int:       __itos_lev1,    long:               __itos_lev1,    \
+    unsigned long:      __itos_lev1,    unsigned long long: __itos_lev1,    \
+    long long:          __itos_lev1,    float:              __ftos_lev1,    \
+    double:             __ftos_lev1,    long double:        __ftos_lev1,    \
+    const char* const:  __stos_lev1,    char*:              __stos_lev1,    \
+    const char*:        __stos_lev1,    char* const:        __stos_lev1,    \
+    str:                __str__lev1,    __cstr:             __cstr_lev1     \
 )(S)
 
 #define __lev2(...) MAP_LIST(__lev1, __VA_ARGS__)
 
-#define __lev3(S, ...) _Generic((S),                                    \
-    str:                __strNret,      str *:        __spret,          \
-    __cstr:             __spret,        char *:       __cpret,          \
-    const char*:        __cpNret                                        \
+#define __lev3(S, ...) _Generic((S),                                        \
+    str:                __strNret,                                          \
+    const char*:        __cpNret                                            \
 )(PP_NARG(S, ##__VA_ARGS__), S, ##__VA_ARGS__)
 
 #define str(...) __lev3(__lev2(__VA_ARGS__))
 
-#define member_size(type, member) sizeof(((type *)0)->member)
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+str __btos_lev1(bool b)
+{
+    size_t len = snprintf(NULL, 0, "%s", (b) ? "true" : "false");
+    str __s = calloc(1, sizeof(__cstr) + len + 1);
+    char *p = (char *)(__s + sizeof(__cstr));
+
+    __s->garbage = true;
+    __s->len = len;
+    snprintf(p, len + 1, "%s", (b) ? "true" : "false");
+    __s->data = p;
+
+    return (str)__s;
+}
 
 str __ctos_lev1(char c)
 {
@@ -198,36 +199,16 @@ str __stos_lev1(const char *const s)
     return (str)__s;
 }
 
-const char* __str__lev1(str __s)
+str __str__lev1(str __s)
 {
-    return (const char*)__s->data;
+    return (str)__s;
 }
 
-// str __str__lev1(str __s)
-// {
-//     return __s;
-// }
-
-str *__pstr_lev1(str *__s)
+const char *__cstr_lev1(__cstr cstr)
 {
-    return __s;
+    return (const char *)cstr.data;
 }
 
-// thing down below is not wotking properly when str(&teststr, 8192) invoked.
-char *__spret(size_t num, str *s, str i, ...)
-{
-    //   // void * __ptr = s - sizeof(__cstr);
-    //   // free(__ptr);
-    //   // str __ptr = *s;
-    //   free(*s);
-    //   size_t len = atoi(i->data);
-    //   *s = malloc(sizeof(__cstr_mut) + len + 1);
-    //   char * p = (void *)*s + sizeof(__cstr_mut);
-
-    //   // memcpy(__ptr, __s, sizeof(__cstr_mut));
-
-    //   return p;
-}
 ///////////////////////////////////////////////////////////
 
 str __strNret(size_t num, ...)
@@ -275,51 +256,9 @@ str __strNret(size_t num, ...)
     return (str)__s;
 }
 
-char *__cstr_lev1(__cstr cstr)
+const char *__cpNret(size_t num, const char *cp, ...)
 {
-    return (char *)cstr.data;
-}
-
-char *__cpret(size_t num, char *cp, ...)
-{
-    return cp;
-}
-
-str __cpNret(size_t num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    size_t len = 0;
-
-    size_t eachlen[128];
-    for (int i = 0; i < num; ++i)
-    {
-        const char *__tmpstr = va_arg(args,  const char *);
-        eachlen[i] = strlen(__tmpstr);
-        len += eachlen[i];
-    }
-    va_end(args);
-
-    str __s = calloc(1, sizeof(__cstr) + len + 1);
-    char *temp = (char *)(__s + sizeof(__cstr));
-
-    va_start(args, num);
-    const char *__tmpstr = va_arg(args,  const char *);
-    strncpy(temp, __tmpstr, eachlen[0]);
-
-    for (int i = 1; i < num; ++i)
-    {
-        __tmpstr = va_arg(args, const char*);
-        strncat(temp, __tmpstr, eachlen[i]);
-  
-    }
-    va_end(args);
-
-    __s->garbage = false;
-    __s->len = len;
-    __s->data = temp;
-
-    return (str)__s;
+    return (const char *)cp;
 }
 
 #endif
