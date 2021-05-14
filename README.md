@@ -1,7 +1,7 @@
 # chadstr.h
 ### Chad Strings - The Chad way to handle strings in C.
 
-One str(...) macro to handle them all.
+One ```str(...)``` macro to handle them all.
 
 ### Examples Usage:
 ```c
@@ -13,7 +13,7 @@ str test3 = str(test2, test1); // returns concat of test2 and test1
 
 test2 = test1; // acceptable, but wrong since test2 now points to test1 not copies it.
 
-str(*test1); // returns char* to use in printf like functions
+str(*test1); // returns const char* to use in printf like functions
 Ex: puts(str(*test1)); // prints test1;
 ```
 *"Why yes, i don't free(), OS cleans all memory for me, how did you know?"*
