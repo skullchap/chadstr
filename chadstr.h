@@ -92,6 +92,18 @@ typedef struct __cstr
 } __cstr;
 typedef __cstr  *str;
 
+typedef struct __cmdt
+{
+    char cmd[16];
+}__cmdt;
+
+typedef __cmdt cmd;
+
+
+__cmdt __pcmd_lev1(__cmdt cmd_);
+str __cmdNret(size_t num, __cmdt cmd_, ...);
+
+str __vtos_lev1(void* p);                     // void to str
 str __btos_lev1(bool b);                     // bool to str
 str __ctos_lev1(char c);                    // char to str
 str __itos_lev1(long long i);              // integers to str
@@ -115,14 +127,18 @@ const char *__cpNret(size_t num, const char* cp, ...); // returns const char * t
     double:             __ftos_lev1,    long double:        __ftos_lev1,    \
     const char* const:  __stos_lev1,    char*:              __stos_lev1,    \
     const char*:        __stos_lev1,    char* const:        __stos_lev1,    \
-    str:                __str__lev1,    __cstr:             __cstr_lev1     \
+    str:                __str__lev1,    __cstr:             __cstr_lev1,    \
+    cmd:                __pcmd_lev1,    void*:              __vtos_lev1     \
 )(S)
 
 #define __lev2(...) MAP_LIST(__lev1, __VA_ARGS__)
 
-#define __lev3(S, ...) _Generic((S),                                        \
+#define Y(S, ...) S
+#define X(...) Y(__VA_ARGS__)
+
+#define __lev3(S, ...) _Generic(X(S),                                       \
     str:                __strNret,                                          \
-    const char*:        __cpNret                                            \
+    const char*:        __cpNret, __cmdt: __cmdNret                         \
 )(PP_NARG(S, ##__VA_ARGS__), S, ##__VA_ARGS__)
 
 #define str(...) __lev3(__lev2(__VA_ARGS__))
@@ -199,6 +215,20 @@ str __stos_lev1(const char *const s)
     return (str)__s;
 }
 
+str __vtos_lev1(void *ptr)
+{
+    void *__s = calloc(1, sizeof(__cstr) + 1);
+    char *p = (char *)(__s + sizeof(__cstr));
+
+    p[0] = '\0';
+
+    ((str)__s)->garbage = true;
+    ((str)__s)->len = 0;
+    ((str)__s)->data = p;
+
+    return (str)__s;
+}
+
 str __str__lev1(str __s)
 {
     return (str)__s;
@@ -259,6 +289,73 @@ str __strNret(size_t num, ...)
 const char *__cpNret(size_t num, const char *cp, ...)
 {
     return (const char *)cp;
+}
+
+__cmdt __pcmd_lev1(cmd cmd_)
+{
+    return cmd_;
+}
+
+str __cmdNret(size_t num, __cmdt cmd_, ...)
+{
+    va_list args;
+    va_start(args, cmd_);
+
+    str __cmd_head = str(cmd_.cmd);
+    str __cmd_body = str(" ");
+
+    for (int i = 1; i < num; ++i)
+    {
+        str __tmpstr = va_arg(args, str);
+        str __cmd_body_old = __cmd_body;
+        __cmd_body = str(__cmd_body, __tmpstr);
+        free(__cmd_body_old);
+    }
+    va_end(args);
+
+    str __cmd_ = str(__cmd_head, __cmd_body);
+    free(__cmd_head);
+    free(__cmd_body);
+
+    FILE *__exec_cmd = popen(str(*__cmd_), "r");
+    if (__exec_cmd == NULL)
+    {
+        fprintf(stderr, "error launching cmd\n");
+        return str(NULL);
+    }
+
+    size_t BUFLEN = 8192;
+
+    char *__buf = malloc(BUFLEN);
+    if (__buf == NULL)
+    {
+        fprintf(stderr, "buf malloc error");
+        return NULL;
+    }
+
+    size_t __bytelen = 0;
+
+    while (__bytelen += fread(__buf, 1, BUFLEN, __exec_cmd))
+    {
+        if (__bytelen < BUFLEN)
+            break;
+        __buf = realloc(__buf, BUFLEN += BUFLEN);
+    }
+    pclose(__exec_cmd);
+
+    void *__s = calloc(1, sizeof(__cstr) + __bytelen);
+    char *p = (char *)(__s + sizeof(__cstr));
+
+    ((str)__s)->garbage = false;
+    ((str)__s)->len = __bytelen - 1;
+    ((str)__s)->data = p;
+
+    memcpy(p, __buf, __bytelen);
+
+    free(__buf);
+    free(__cmd_);
+
+    return __s;
 }
 
 #endif
