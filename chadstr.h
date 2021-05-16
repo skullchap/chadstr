@@ -82,6 +82,14 @@
         19, 18, 17, 16, 15, 14, 13, 12, 11, 10,           \
         9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
+#define XOR_SWAP(a, b) \
+    do                 \
+    {                  \
+        a ^= b;        \
+        b ^= a;        \
+        a ^= b;        \
+    } while (0)
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef struct __cstr
@@ -94,10 +102,17 @@ typedef __cstr  *str;
 
 typedef struct __cmdt
 {
-    char cmd[16];
+    char *cmd;
 }__cmdt;
 
 typedef __cmdt cmd;
+
+
+
+str __str_range(str __s_in, long long start, long long end);
+
+typedef str (*__range_func)(str s, long long a , long long b );
+__range_func range = &__str_range;
 
 
 __cmdt __pcmd_lev1(__cmdt cmd_);
@@ -128,7 +143,7 @@ const char *__cpNret(size_t num, const char* cp, ...); // returns const char * t
     const char* const:  __stos_lev1,    char*:              __stos_lev1,    \
     const char*:        __stos_lev1,    char* const:        __stos_lev1,    \
     str:                __str__lev1,    __cstr:             __cstr_lev1,    \
-    cmd:                __pcmd_lev1,    void*:              __vtos_lev1     \
+    cmd:                __pcmd_lev1,    void*:              __vtos_lev1   \
 )(S)
 
 #define __lev2(...) MAP_LIST(__lev1, __VA_ARGS__)
@@ -142,6 +157,8 @@ const char *__cpNret(size_t num, const char* cp, ...); // returns const char * t
 )(PP_NARG(S, ##__VA_ARGS__), S, ##__VA_ARGS__)
 
 #define str(...) __lev3(__lev2(__VA_ARGS__))
+
+#define __str(...) __lev3(__lev2(__VA_ARGS__)) // to use in functions
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -356,6 +373,54 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     free(__cmd_);
 
     return __s;
+}
+
+str __str_range(str __s_in, long long start, long long end)
+{
+    size_t __strlen = __s_in->len;
+
+    long long __abs = (end - start > 0)
+                       ? end - start
+                       : -1 * (end - start);
+
+    if (__abs > __strlen)
+    {
+        return str(NULL);
+    }
+
+#define HUMAN_SHIFT 0
+#ifdef  HUMAN_RANGE
+#undef  HUMAN_SHIFT
+#define HUMAN_SHIFT 1
+
+    if (start == 0)
+        start = 1;
+
+#endif
+
+    if (start > end)
+    {
+
+        char *__pstart = __s_in->data;
+        char *__pend = __s_in->data + __strlen - 1;
+
+        while (__pstart < __pend)
+        {
+            XOR_SWAP(*__pstart, *__pend);
+            __pstart++;
+            __pend--;
+        }
+    }
+
+    char *temp = malloc(__strlen + 1);
+
+    strncpy(temp, str(*__s_in) + start - HUMAN_SHIFT, __abs + 1);
+#undef HUMAN_SHIFT
+
+    str __s_out = str(temp);
+    free(temp);
+
+    return __s_out;
 }
 
 #endif
