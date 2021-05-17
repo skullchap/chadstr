@@ -375,6 +375,13 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     return __s;
 }
 
+/*
+ * If you are comfortable with range starting at index 0,
+ * #define NONHUMAN_RANGE before #include "chadstr.h"
+ * Note: negative end indices are still in "human" format 
+ * starting at 1
+*/
+
 str __str_range(str __s_in, long long start, long long end)
 {
 #define NONHUMAN_SHIFT 1
