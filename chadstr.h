@@ -169,13 +169,14 @@ inline void __free_(void *ptr) {
 
 str __btos_lev1(bool b)
 {
-    size_t len = snprintf(NULL, 0, "%s", (b) ? "true" : "false");
-    void *__s = calloc(1, sizeof(__cstr) + len + 1);
+    size_t len = (b) ? 4 : 5;
+    void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
-    snprintf(p, len + 1, "%s", (b) ? "true" : "false");
+    p = (b) ? "true" : "false"; 
+    p[len] = '\0';
 
     ((str)__s)->data = p;
 
@@ -184,13 +185,14 @@ str __btos_lev1(bool b)
 
 str __ctos_lev1(char c)
 {
-    size_t len = snprintf(NULL, 0, "%c", c);
-    void *__s = calloc(1, sizeof(__cstr) + len + 1);
+    size_t len = 1; 
+    void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
-    snprintf(p, len + 1, "%c", c);
+    p[0] = c;
+    p[len] = '\0';
     ((str)__s)->data = p;
 
     return (str)__s;
@@ -199,12 +201,13 @@ str __ctos_lev1(char c)
 str __itos_lev1(long long i)
 {
     size_t len = snprintf(NULL, 0, "%lld", i);
-    void *__s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
     snprintf(p, len + 1, "%lld", i);
+    p[len] = '\0';
     ((str)__s)->data = p;
 
     return (str)__s;
@@ -213,12 +216,13 @@ str __itos_lev1(long long i)
 str __ftos_lev1(double d)
 {
     size_t len = snprintf(NULL, 0, "%f", d);
-    void *__s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
     snprintf(p, len + 1, "%f", d);
+    p[len] = '\0';
     ((str)__s)->data = p;
 
     return (str)__s;
@@ -226,13 +230,13 @@ str __ftos_lev1(double d)
 
 str __stos_lev1(const char *const s)
 {
-    size_t len = snprintf(NULL, 0, "%s", s);
-    void *__s = calloc(1, sizeof(__cstr) + len + 1);
+    size_t len = strlen(s);
+    void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
-    snprintf(p, len + 1, "%s", s);
+    memcpy(p, s, len + 1);
     ((str)__s)->data = p;
 
     return (str)__s;
@@ -240,7 +244,7 @@ str __stos_lev1(const char *const s)
 
 str __vtos_lev1(void *ptr)
 {
-    void *__s = calloc(1, sizeof(__cstr) + 1);
+    void *__s = malloc(sizeof(__cstr) + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
     p[0] = '\0';
@@ -269,7 +273,7 @@ str __strNret(size_t num, ...)
     va_list args;
     va_start(args, num);
     size_t len = 0;
-
+    size_t index = 0;
     for (int i = 0; i < num; ++i)
     {
         str __tmpstr = va_arg(args, str);
@@ -277,12 +281,13 @@ str __strNret(size_t num, ...)
     }
     va_end(args);
 
-    void *__s = calloc(1, sizeof(__cstr) + len + 1);
+    void *__s = malloc(sizeof(__cstr) + len + 1);
     char *temp = (char *)(__s + sizeof(__cstr));
 
     va_start(args, num);
     str __tmpstr = va_arg(args, str);
-    strncpy(temp, __tmpstr->data, __tmpstr->len);
+    memcpy(temp, __tmpstr->data, __tmpstr->len);
+    index += __tmpstr->len;
     if (__tmpstr->garbage)
     {
         free(__tmpstr);
@@ -292,13 +297,15 @@ str __strNret(size_t num, ...)
     for (int i = 1; i < num; ++i)
     {
         __tmpstr = va_arg(args, str);
-        strncat(temp, __tmpstr->data, __tmpstr->len);
+        memcpy(temp + index, __tmpstr->data, __tmpstr->len);
+        index += __tmpstr->len;
         if (__tmpstr->garbage)
         {
             free(__tmpstr);
         }
     }
     __tmpstr = NULL;
+    temp[len] = '\0';
 
     va_end(args);
 
@@ -349,7 +356,7 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
 
     size_t BUFLEN = 8192;
 
-    char *__buf = malloc(BUFLEN);
+    char *__buf = calloc(1, BUFLEN);
     if (__buf == NULL)
     {
         fprintf(stderr, "buf malloc error\n");
@@ -357,12 +364,13 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     }
 
     size_t __bytelen = 0;
-
+    
     while (__bytelen += fread(__buf, 1, BUFLEN, __exec_cmd))
     {
-        if (__bytelen < BUFLEN)
+        if (__bytelen <= BUFLEN)
             break;
         __buf = realloc(__buf, BUFLEN += BUFLEN);
+        
     }
     pclose(__exec_cmd);
 
@@ -373,7 +381,7 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     ((str)__s)->len = __bytelen - 1;
     ((str)__s)->data = p;
 
-    memcpy(p, __buf, __bytelen);
+    strncpy(p, __buf, __bytelen);
 
     free(__buf);
     free(__cmd_);
@@ -434,9 +442,9 @@ str __str_range(str __s_in, long long start, long long end)
         }
     }
 
-    char *temp = malloc(__abs + 2); // + space for "\0"
-
-    strncpy(temp, str(*__s_in) + start - NONHUMAN_SHIFT, __abs + 1);
+    char *temp = calloc(1, __abs + 2);
+    printf("%lld\n", __abs);
+    strncpy(temp, __s_in->data + start - NONHUMAN_SHIFT, __abs + 1);
 
 #undef NONHUMAN_SHIFT
 

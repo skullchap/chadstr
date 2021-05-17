@@ -48,19 +48,19 @@ Instead of writing shitload of different functions for some specific task, you c
 ```c
 cmd CMD = (cmd){"echo"}
 chadstr test1 = str("orange apple");
-chadstr pipecmd = str(" | cut -z -d " " -f1 "); 
+chadstr pipecmd = str(" | cut -z -d \" \" -f1 "); 
 chadstr result = str(CMD, test1, pipecmd); // "echo orange apple | cut -z -d " " -f1" as you would do in shell
 
 /* chadstr result = str((cmd){"echo"}, test1, pipecmd); is also acceptable */
 
-puts(*str(*result));
+puts(str(*result));
 ```
 File embedding never been so easy using this way:
 ```c
 cmd CAT = (cmd){"cat"};
 chadstr file = str(CAT, "README.md"); // cat README.md
 
-puts(*str(*file));
+puts(str(*file));
 ```
 ChadSTR also has utility function ```range()``` to select range of string:
 
