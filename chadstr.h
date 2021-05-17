@@ -175,7 +175,7 @@ str __btos_lev1(bool b)
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
-    p = (b) ? "true" : "false"; 
+    p = (b) ? "true" : "false";
     p[len] = '\0';
 
     ((str)__s)->data = p;
@@ -185,7 +185,7 @@ str __btos_lev1(bool b)
 
 str __ctos_lev1(char c)
 {
-    size_t len = 1; 
+    size_t len = 1;
     void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
@@ -364,13 +364,13 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     }
 
     size_t __bytelen = 0;
-    
+
     while (__bytelen += fread(__buf, 1, BUFLEN, __exec_cmd))
     {
         if (__bytelen < BUFLEN)
             break;
         __buf = realloc(__buf, BUFLEN += BUFLEN);
-        
+
     }
     pclose(__exec_cmd);
 
@@ -443,7 +443,6 @@ str __str_range(str __s_in, long long start, long long end)
     }
 
     char *temp = calloc(1, __abs + 2);
-    printf("%lld\n", __abs);
     strncpy(temp, __s_in->data + start - NONHUMAN_SHIFT, __abs + 1);
 
 #undef NONHUMAN_SHIFT
