@@ -429,7 +429,7 @@ str __str_range(str __s_in, long long start, long long end)
         }
     }
 
-    char *temp = malloc(__strlen + 1);
+    char *temp = malloc(__abs + 2); // + space for "\0"
 
     strncpy(temp, str(*__s_in) + start - NONHUMAN_SHIFT, __abs + 1);
 
