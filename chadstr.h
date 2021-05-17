@@ -171,6 +171,7 @@ str __btos_lev1(bool b)
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
     snprintf(p, len + 1, "%s", (b) ? "true" : "false");
+
     ((str)__s)->data = p;
 
     return (str)__s;
@@ -385,30 +386,29 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
 str __str_range(str __s_in, long long start, long long end)
 {
 #define NONHUMAN_SHIFT 1
-#ifdef  NONHUMAN_RANGE
-#undef  NONHUMAN_SHIFT
+#ifdef NONHUMAN_RANGE
+#undef NONHUMAN_SHIFT
 #define NONHUMAN_SHIFT 0
 #endif
 
-
     size_t __strlen = __s_in->len;
 
-    if(end < 0)
+    if (end < 0)
         end = __strlen + end + NONHUMAN_SHIFT;
-    
-    if(start < 0)
+
+    if (start < 0)
         start = 0;
 
     long long __abs = (end - start > 0)
-                       ? end - start
-                       : -1 * (end - start);
+                          ? end - start
+                          : -1 * (end - start);
 
     if (__abs > __strlen)
     {
         return str(NULL);
     }
 
-#ifdef  NONHUMAN_RANGE
+#ifdef NONHUMAN_RANGE
 
     if (start == 0)
         start = 1;
@@ -436,6 +436,7 @@ str __str_range(str __s_in, long long start, long long end)
 #undef NONHUMAN_SHIFT
 
     str __s_out = str(temp);
+    __s_out->garbage = true;
     free(temp);
 
     return __s_out;
