@@ -377,7 +377,20 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
 
 str __str_range(str __s_in, long long start, long long end)
 {
+#define NONHUMAN_SHIFT 1
+#ifdef  NONHUMAN_RANGE
+#undef  NONHUMAN_SHIFT
+#define NONHUMAN_SHIFT 0
+#endif
+
+
     size_t __strlen = __s_in->len;
+
+    if(end < 0)
+        end = __strlen + end + NONHUMAN_SHIFT;
+    
+    if(start < 0)
+        start = 0;
 
     long long __abs = (end - start > 0)
                        ? end - start
@@ -388,10 +401,7 @@ str __str_range(str __s_in, long long start, long long end)
         return str(NULL);
     }
 
-#define HUMAN_SHIFT 0
-#ifdef  HUMAN_RANGE
-#undef  HUMAN_SHIFT
-#define HUMAN_SHIFT 1
+#ifdef  NONHUMAN_RANGE
 
     if (start == 0)
         start = 1;
@@ -414,8 +424,9 @@ str __str_range(str __s_in, long long start, long long end)
 
     char *temp = malloc(__strlen + 1);
 
-    strncpy(temp, str(*__s_in) + start - HUMAN_SHIFT, __abs + 1);
-#undef HUMAN_SHIFT
+    strncpy(temp, str(*__s_in) + start - NONHUMAN_SHIFT, __abs + 1);
+
+#undef NONHUMAN_SHIFT
 
     str __s_out = str(temp);
     free(temp);
