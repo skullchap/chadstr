@@ -107,13 +107,9 @@ typedef struct __cmdt
 
 typedef __cmdt cmd;
 
-
-
 str __str_range(str __s_in, long long start, long long end);
-
 typedef str (*__range_func)(str s, long long a , long long b );
 __range_func range = &__str_range;
-
 
 __cmdt __pcmd_lev1(__cmdt cmd_);
 str __cmdNret(size_t num, __cmdt cmd_, ...);
@@ -159,6 +155,15 @@ const char *__cpNret(size_t num, const char* cp, ...); // returns const char * t
 #define str(...) __lev3(__lev2(__VA_ARGS__))
 
 #define __str(...) __lev3(__lev2(__VA_ARGS__)) // to use in functions
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__attribute__ ((always_inline))
+inline void __free_(void *ptr) {
+    free(*(void **) ptr);
+}
+#define autofree __attribute__((cleanup(__free_)))
+#define chadstr __attribute__((cleanup(__free_))) str
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -347,8 +352,8 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     char *__buf = malloc(BUFLEN);
     if (__buf == NULL)
     {
-        fprintf(stderr, "buf malloc error");
-        return NULL;
+        fprintf(stderr, "buf malloc error\n");
+        return str(NULL);
     }
 
     size_t __bytelen = 0;
@@ -415,7 +420,7 @@ str __str_range(str __s_in, long long start, long long end)
 
 #endif
 
-    if (start > end)
+    if (start > end) // swap
     {
 
         char *__pstart = __s_in->data;
