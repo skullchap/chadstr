@@ -367,7 +367,7 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     
     while (__bytelen += fread(__buf, 1, BUFLEN, __exec_cmd))
     {
-        if (__bytelen <= BUFLEN)
+        if (__bytelen < BUFLEN)
             break;
         __buf = realloc(__buf, BUFLEN += BUFLEN);
         
