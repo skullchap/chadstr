@@ -25,4 +25,62 @@ Ex: puts(str(*test1)); // prints test1;
 ```c
 free(test1); // will free memory for whole str.
 ```
+*"Whoa, whoa, wait bro. But how about freeing str->data field?"*
 
+While allocating memory for 'str' struct itself it also reserves space beneath it to store that string.
+str->data points to that location. So freeing str itself also frees memory located at str->data.
+
+If your coompiler does support ```"__attribute__((cleanup()))"``` *("aahem gcc/clang")*, strings can be auto free'd while defined this way:
+```c
+autofree str test1 = str("apple");
+...
+// no free(test1); !!!
+```
+or
+```c
+chadstr test2 = str("pineapple");
+...
+// no free(test2); !!!
+```
+## Operations on Chad Strings:
+Instead of writing shitload of different functions for some specific task, you can utilize already existing tools in your OS to do that for you.
+### Examples Usage:
+```c
+cmd CMD = (cmd){"echo"}
+chadstr test1 = str("orange apple");
+chadstr pipecmd = str(" | cut -z -d " " -f1 "); 
+chadstr result = str(CMD, test1, pipecmd); // "echo orange apple | cut -z -d " " -f1" as you would do in shell
+
+/* chadstr result = str((cmd){"echo"}, test1, pipecmd); is also acceptable */
+
+puts(*str(*result));
+```
+File embedding never been so easy using this way:
+```c
+cmd CAT = (cmd){"cat"};
+chadstr file = str(CAT, "README.md"); // cat README.md
+
+puts(*str(*file));
+```
+ChadSTR also has utility function ```range()``` to select range of string:
+
+```c
+chadstr test1 = str("pineapple"); 
+chadstr test1range = str((range)(test1, 3,6)); // neap
+
+/*
+ * If you are comfortable with range starting at index 0,
+ * #define NONHUMAN_RANGE before #include "chadstr.h"
+ * Note: negative end indices are still in "human" format 
+ * starting at 1
+*/
+
+#define NONHUMAN_RANGE
+#include "chadstr.h"
+
+...
+
+chadstr test1 = str("pineapple"); 
+chadstr test1range = str((range)(test1, 3,6)); // eapp
+
+```
