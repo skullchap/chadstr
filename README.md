@@ -60,7 +60,7 @@ chadstr result = str(CMD, test1, pipecmd); // "echo orange apple | cut -z -d " "
 
 puts(str(*result));
 ```
-File embedding never been so easy using this way:
+File embedding has never been easier with ChadSTR:
 ```c
 cmd CAT = (cmd){"cat"};
 chadstr file = str(CAT, "README.md"); // cat README.md
