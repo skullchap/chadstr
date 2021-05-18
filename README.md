@@ -44,6 +44,11 @@ chadstr test2 = str("pineapple");
 ```
 ## Operations on Chad Strings:
 Instead of writing shitload of different functions for some specific task, you can utilize already existing tools in your OS to do that for you.
+
+<p>
+  <img src="meme.png" />
+</p>
+
 ### Examples Usage:
 ```c
 cmd CMD = (cmd){"echo"}
@@ -84,3 +89,48 @@ chadstr test1 = str("pineapple");
 chadstr test1range = str((range)(test1, 3,6)); // eapp
 
 ```
+Another example on generating random string with buffer and per char copying:
+```c
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "chadstr.h"
+
+str random_string(size_t length)
+{
+    chadstr pool = str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    size_t randindex;
+    size_t i;
+
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+
+    /* using nano-seconds instead of seconds */
+    srand((time_t)ts.tv_nsec);
+
+    char buffer[length];
+
+    for(i = 0; i < length; ++i)
+    {
+        randindex = rand() % pool->len;
+        buffer[i] = pool->data[randindex] ^ ((rand() % 2) ? 0 : 0x20);  
+    }
+
+    buffer[i] = '\0';
+
+    return str(buffer);
+}
+
+int main(void)
+{
+    for (int i = 0; i < 1000; ++i)
+    {
+        chadstr s = random_string(120);
+        puts(str(*s));
+    }
+    return 0;
+}
+```
+
+### PRs are welcomed.
