@@ -71,22 +71,22 @@ ChadSTR also has utility function ```range()``` to select range of string:
 
 ```c
 chadstr test1 = str("pineapple"); 
-chadstr test1range = str((range)(test1, 3,6)); // neap
+chadstr test1range = str((range)(test1, 3,6)); // eapp
 
 /*
- * If you are comfortable with range starting at index 0,
- * #define NONHUMAN_RANGE before #include "chadstr.h"
+ * If you are comfortable with range starting at index 1,
+ * #define HUMAN_RANGE before #include "chadstr.h"
  * Note: negative end indices are still in "human" format 
- * starting at 1
+ * starting at 1 no matter HUMAN_RANGE defined or not.
 */
 
-#define NONHUMAN_RANGE
+#define HUMAN_RANGE
 #include "chadstr.h"
 
 ...
 
 chadstr test1 = str("pineapple"); 
-chadstr test1range = str((range)(test1, 3,6)); // eapp
+chadstr test1range = str((range)(test1, 3,6)); // neap
 
 ```
 Another example on generating random string with buffer and per char copying:

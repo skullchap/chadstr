@@ -390,24 +390,24 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
 }
 
 /*
- * If you are comfortable with range starting at index 0,
- * #define NONHUMAN_RANGE before #include "chadstr.h"
+ * If you are comfortable with range starting at index 1,
+ * #define HUMAN_RANGE before #include "chadstr.h"
  * Note: negative end indices are still in "human" format 
- * starting at 1
+ * starting at 1 no matter HUMAN_RANGE defined or not.
 */
 
 str __str_range(str __s_in, long long start, long long end)
 {
-#define NONHUMAN_SHIFT 1
-#ifdef NONHUMAN_RANGE
-#undef NONHUMAN_SHIFT
-#define NONHUMAN_SHIFT 0
+#define HUMAN_SHIFT 0
+#ifdef HUMAN_RANGE
+#undef HUMAN_SHIFT
+#define HUMAN_SHIFT 1
 #endif
 
     size_t __strlen = __s_in->len;
 
     if (end < 0)
-        end = __strlen + end + NONHUMAN_SHIFT;
+        end = __strlen + end + HUMAN_SHIFT;
 
     if (start < 0)
         start = 0;
@@ -421,7 +421,7 @@ str __str_range(str __s_in, long long start, long long end)
         return str(NULL);
     }
 
-#ifdef NONHUMAN_RANGE
+#ifdef HUMAN_RANGE
 
     if (start == 0)
         start = 1;
@@ -443,9 +443,9 @@ str __str_range(str __s_in, long long start, long long end)
     }
 
     char *temp = calloc(1, __abs + 2);
-    strncpy(temp, __s_in->data + start - NONHUMAN_SHIFT, __abs + 1);
+    strncpy(temp, __s_in->data + start - HUMAN_SHIFT, __abs + 1);
 
-#undef NONHUMAN_SHIFT
+#undef HUMAN_SHIFT
 
     str __s_out = str(temp);
     __s_out->garbage = true;
