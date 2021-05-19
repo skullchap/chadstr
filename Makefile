@@ -16,3 +16,4 @@ clean: random_string
 default: examples
 
 all: examples install
+
