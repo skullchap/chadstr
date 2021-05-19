@@ -430,23 +430,27 @@ str __str_range(str __s_in, long long start, long long end)
 
     if (start > end) // swap
     {
-
-        char *__pstart = __s_in->data;
-        char *__pend = __s_in->data + __strlen - 1;
+        char *__pstart = __s_in->data + end - HUMAN_SHIFT;
+        char *__pend = __s_in->data + start - HUMAN_SHIFT;
 
         while (__pstart < __pend)
         {
-            XOR_SWAP(*__pstart, *__pend);
+            char tmp = *__pstart;
+            *__pstart = *__pend;
+            *__pend = tmp;
             __pstart++;
             __pend--;
         }
     }
 
     char *temp = calloc(1, __abs + 2);
-    strncpy(temp, __s_in->data + start - HUMAN_SHIFT, __abs + 1);
+    if(start > end) {
+        strncpy(temp, __s_in->data + end - HUMAN_SHIFT, __abs + 1);
+    } else {
+        strncpy(temp, __s_in->data + start - HUMAN_SHIFT, __abs + 1);
+    }
 
 #undef HUMAN_SHIFT
-
     str __s_out = str(temp);
     __s_out->garbage = true;
     free(temp);
