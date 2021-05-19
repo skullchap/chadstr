@@ -60,7 +60,7 @@ chadstr result = str(CMD, test1, pipecmd); // "echo orange apple | cut -z -d " "
 
 puts(str(*result));
 ```
-File embedding never been so easy using this way:
+File embedding has never been easier with ChadSTR:
 ```c
 cmd CAT = (cmd){"cat"};
 chadstr file = str(CAT, "README.md"); // cat README.md
@@ -71,22 +71,22 @@ ChadSTR also has utility function ```range()``` to select range of string:
 
 ```c
 chadstr test1 = str("pineapple"); 
-chadstr test1range = str((range)(test1, 3,6)); // neap
+chadstr test1range = str((range)(test1, 3,6)); // eapp
 
 /*
- * If you are comfortable with range starting at index 0,
- * #define NONHUMAN_RANGE before #include "chadstr.h"
+ * If you are comfortable with range starting at index 1,
+ * #define HUMAN_RANGE before #include "chadstr.h"
  * Note: negative end indices are still in "human" format 
- * starting at 1
+ * starting at 1 no matter HUMAN_RANGE defined or not.
 */
 
-#define NONHUMAN_RANGE
+#define HUMAN_RANGE
 #include "chadstr.h"
 
 ...
 
 chadstr test1 = str("pineapple"); 
-chadstr test1range = str((range)(test1, 3,6)); // eapp
+chadstr test1range = str((range)(test1, 3,6)); // neap
 
 ```
 Another example on generating random string with buffer and per char copying:
@@ -109,7 +109,7 @@ str random_string(size_t length)
     /* using nano-seconds instead of seconds */
     srand((time_t)ts.tv_nsec);
 
-    char buffer[length];
+    char buffer[length+1];
 
     for(i = 0; i < length; ++i)
     {
