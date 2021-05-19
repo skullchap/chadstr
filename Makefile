@@ -1,8 +1,8 @@
 CC = gcc
-Flags = -I. -O3
+CFLAGS = -I. -O3
 
 examples random_string: example/random_string.c
-	$(CC) example/random_string.c $(Flags) -o random_string
+	$(CC) example/random_string.c $(CFLAGS) -o random_string
 
 install: chadstr.h
 	cp chadstr.h /usr/include/chadstr.h
@@ -15,3 +15,4 @@ clean: random_string
 
 default: examples
 
+all: examples install
