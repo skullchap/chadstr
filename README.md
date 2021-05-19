@@ -109,7 +109,7 @@ str random_string(size_t length)
     /* using nano-seconds instead of seconds */
     srand((time_t)ts.tv_nsec);
 
-    char buffer[length];
+    char buffer[length+1];
 
     for(i = 0; i < length; ++i)
     {
