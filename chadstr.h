@@ -406,6 +406,13 @@ str __str_range(str __s_in, long long start, long long end)
 
     size_t __strlen = __s_in->len;
 
+#ifdef HUMAN_RANGE
+
+    if (start > 0) start--;
+    if (end > 0) end--;
+
+#endif
+
     if (end < 0)
         end = __strlen + end;
 
@@ -421,17 +428,10 @@ str __str_range(str __s_in, long long start, long long end)
         return str(NULL);
     }
 
-#ifdef HUMAN_RANGE
-
-    if (start == 0)
-        start = 1;
-
-#endif
-
     if (start > end) // swap
     {
-        char *__pstart = __s_in->data + end - HUMAN_SHIFT;
-        char *__pend = __s_in->data + start - HUMAN_SHIFT;
+        char *__pstart = __s_in->data + end;
+        char *__pend = __s_in->data + start;
 
         while (__pstart < __pend)
         {
@@ -445,9 +445,9 @@ str __str_range(str __s_in, long long start, long long end)
 
     char *temp = calloc(1, __abs + 2);
     if(start > end) {
-        strncpy(temp, __s_in->data + end - HUMAN_SHIFT, __abs + 1);
+        strncpy(temp, __s_in->data + end, __abs + 1);
     } else {
-        strncpy(temp, __s_in->data + start - HUMAN_SHIFT, __abs + 1);
+        strncpy(temp, __s_in->data + start, __abs + 1);
     }
 
 #undef HUMAN_SHIFT
