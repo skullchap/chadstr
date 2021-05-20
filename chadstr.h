@@ -82,14 +82,6 @@
         19, 18, 17, 16, 15, 14, 13, 12, 11, 10,           \
         9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
-#define XOR_SWAP(a, b) \
-    do                 \
-    {                  \
-        a ^= b;        \
-        b ^= a;        \
-        a ^= b;        \
-    } while (0)
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef struct __cstr
@@ -169,7 +161,7 @@ inline void __free_(void *ptr) {
 
 str __btos_lev1(bool b)
 {
-    size_t len = (b) ? 4 : 5;
+    size_t len = (b) ? 4 : 5; // bool can be either "true" or "false"
     void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
@@ -185,7 +177,7 @@ str __btos_lev1(bool b)
 
 str __ctos_lev1(char c)
 {
-    size_t len = 1;
+    size_t len = 1; // char is always one character long
     void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
@@ -242,7 +234,7 @@ str __stos_lev1(const char *const s)
     return (str)__s;
 }
 
-str __vtos_lev1(void *ptr)
+str __vtos_lev1(void *ptr) // create an empty str
 {
     void *__s = malloc(sizeof(__cstr) + 1);
     char *p = (char *)(__s + sizeof(__cstr));
