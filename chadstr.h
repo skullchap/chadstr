@@ -82,6 +82,13 @@
         19, 18, 17, 16, 15, 14, 13, 12, 11, 10,           \
         9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
+#define SWAP(a, b)     \
+    {                  \
+        char tmp = *a; \
+        *a = *b;       \
+        *b = tmp;      \
+    }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef struct __cstr
@@ -397,19 +404,21 @@ str __str_range(str __s_in, long long start, long long end)
 #endif
 
     size_t __strlen = __s_in->len;
-
 #ifdef HUMAN_RANGE
 
     if (start > 0) start--;
     if (end > 0) end--;
 
 #endif
-
     if (end < 0)
         end = __strlen + end;
+    if (end < 0)
+        return str(NULL);
 
     if (start < 0)
         start = __strlen + start;
+    if (start < 0)
+        return str(NULL);
 
     long long __abs = (end - start > 0)
                           ? end - start
@@ -419,23 +428,26 @@ str __str_range(str __s_in, long long start, long long end)
     {
         return str(NULL);
     }
-
+    
     if (start > end) // swap
     {
-        char *__pstart = __s_in->data + end;
-        char *__pend = __s_in->data + start;
+
+        char *__pstart = __s_in->data;
+        char *__pend = __s_in->data + __strlen - 1;
 
         while (__pstart < __pend)
         {
-            char tmp = *__pstart;
-            *__pstart = *__pend;
-            *__pend = tmp;
+            SWAP(__pstart, __pend);
             __pstart++;
             __pend--;
         }
+
+        start = __strlen - ((start > 0) ? start : (-1 * start)) - 1;
+        end = __strlen - ((end > 0) ? end : (-1 * end)) - 1;
     }
 
-    char *temp = calloc(1, __abs + 2);
+    char *temp = calloc(1, __abs + 2);    
+    
     if(start > end) {
         strncpy(temp, __s_in->data + end, __abs + 1);
     } else {
@@ -443,6 +455,7 @@ str __str_range(str __s_in, long long start, long long end)
     }
 
 #undef HUMAN_SHIFT
+
     str __s_out = str(temp);
     __s_out->garbage = true;
     free(temp);
