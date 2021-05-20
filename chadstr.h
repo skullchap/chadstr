@@ -407,10 +407,10 @@ str __str_range(str __s_in, long long start, long long end)
     size_t __strlen = __s_in->len;
 
     if (end < 0)
-        end = __strlen + end + HUMAN_SHIFT;
+        end = __strlen + end;
 
     if (start < 0)
-        start = 0;
+        start = __strlen + start;
 
     long long __abs = (end - start > 0)
                           ? end - start
