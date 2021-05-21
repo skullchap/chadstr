@@ -82,13 +82,12 @@
         19, 18, 17, 16, 15, 14, 13, 12, 11, 10,           \
         9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
-#define XOR_SWAP(a, b) \
-    do                 \
+#define SWAP(a, b)     \
     {                  \
-        a ^= b;        \
-        b ^= a;        \
-        a ^= b;        \
-    } while (0)
+        char tmp = *a; \
+        *a = *b;       \
+        *b = tmp;      \
+    }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -169,7 +168,7 @@ inline void __free_(void *ptr) {
 
 str __btos_lev1(bool b)
 {
-    size_t len = (b) ? 4 : 5;
+    size_t len = (b) ? 4 : 5; // bool can be either "true" or "false"
     void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
@@ -185,7 +184,7 @@ str __btos_lev1(bool b)
 
 str __ctos_lev1(char c)
 {
-    size_t len = 1;
+    size_t len = 1; // char is always one character long
     void *__s = malloc(sizeof(__cstr) + len + 1);
     char *p = (char *)(__s + sizeof(__cstr));
 
@@ -242,7 +241,7 @@ str __stos_lev1(const char *const s)
     return (str)__s;
 }
 
-str __vtos_lev1(void *ptr)
+str __vtos_lev1(void *ptr) // create an empty str
 {
     void *__s = malloc(sizeof(__cstr) + 1);
     char *p = (char *)(__s + sizeof(__cstr));
@@ -405,12 +404,21 @@ str __str_range(str __s_in, long long start, long long end)
 #endif
 
     size_t __strlen = __s_in->len;
+#ifdef HUMAN_RANGE
 
+    if (start > 0) start--;
+    if (end > 0) end--;
+
+#endif
     if (end < 0)
-        end = __strlen + end + HUMAN_SHIFT;
+        end = __strlen + end;
+    if (end < 0)
+        return str(NULL);
 
     if (start < 0)
-        start = 0;
+        start = __strlen + start;
+    if (start < 0)
+        return str(NULL);
 
     long long __abs = (end - start > 0)
                           ? end - start
@@ -420,14 +428,7 @@ str __str_range(str __s_in, long long start, long long end)
     {
         return str(NULL);
     }
-
-#ifdef HUMAN_RANGE
-
-    if (start == 0)
-        start = 1;
-
-#endif
-
+    
     if (start > end) // swap
     {
 
@@ -436,14 +437,22 @@ str __str_range(str __s_in, long long start, long long end)
 
         while (__pstart < __pend)
         {
-            XOR_SWAP(*__pstart, *__pend);
+            SWAP(__pstart, __pend);
             __pstart++;
             __pend--;
         }
+
+        start = __strlen - ((start > 0) ? start : (-1 * start)) - 1;
+        end = __strlen - ((end > 0) ? end : (-1 * end)) - 1;
     }
 
-    char *temp = calloc(1, __abs + 2);
-    strncpy(temp, __s_in->data + start - HUMAN_SHIFT, __abs + 1);
+    char *temp = calloc(1, __abs + 2);    
+    
+    if(start > end) {
+        strncpy(temp, __s_in->data + end, __abs + 1);
+    } else {
+        strncpy(temp, __s_in->data + start, __abs + 1);
+    }
 
 #undef HUMAN_SHIFT
 
