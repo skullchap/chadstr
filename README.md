@@ -30,7 +30,7 @@ free(test1); // will free memory for whole str.
 While allocating memory for 'str' struct itself it also reserves space beneath it to store that string.
 str->data points to that location. So freeing str itself also frees memory located at str->data.
 
-If your coompiler does support ```"__attribute__((cleanup()))"``` *("aahem gcc/clang")*, strings can be auto free'd while defined this way:
+If your compiler does support ```"__attribute__((cleanup()))"``` *("aahem gcc/clang")*, strings can be auto free'd while defined this way:
 ```c
 autofree str test1 = str("apple");
 ...
