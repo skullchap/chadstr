@@ -389,6 +389,14 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     return __s;
 }
 
+// Print str macro
+
+void chadprint(str s)
+{
+    puts(str(*s));
+}
+
+
 /*
  * If you are comfortable with range starting at index 1,
  * #define HUMAN_RANGE before #include "chadstr.h"
