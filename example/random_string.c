@@ -30,7 +30,7 @@ str random_string(size_t length) {
 int main(void) {
   for (int i = 0; i < 1000; ++i) {
     chadstr s = random_string(120);
-    puts(str(*s));
+    chadprint(s);
   }
   return 0;
 }
