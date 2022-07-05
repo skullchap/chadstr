@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -I. -O3
+CFLAGS = -I. -O3 -Werror -Wpedantic
 
 examples random_string: example/random_string.c
 	$(CC) example/random_string.c $(CFLAGS) -o random_string
