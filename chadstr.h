@@ -170,7 +170,7 @@ str __btos_lev1(bool b)
 {
     size_t len = (b) ? 4 : 5; // bool can be either "true" or "false"
     void *__s = malloc(sizeof(__cstr) + len + 1);
-    char *p = (char *)(__s + sizeof(__cstr));
+    char *p = (char *)((size_t)__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
@@ -186,7 +186,7 @@ str __ctos_lev1(char c)
 {
     size_t len = 1; // char is always one character long
     void *__s = malloc(sizeof(__cstr) + len + 1);
-    char *p = (char *)(__s + sizeof(__cstr));
+    char *p = (char *)((size_t)__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
@@ -201,7 +201,7 @@ str __itos_lev1(long long i)
 {
     size_t len = snprintf(NULL, 0, "%lld", i);
     void *__s = malloc(sizeof(__cstr) + len + 1);
-    char *p = (char *)(__s + sizeof(__cstr));
+    char *p = (char *)((size_t)__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
@@ -216,7 +216,7 @@ str __ftos_lev1(double d)
 {
     size_t len = snprintf(NULL, 0, "%f", d);
     void *__s = malloc(sizeof(__cstr) + len + 1);
-    char *p = (char *)(__s + sizeof(__cstr));
+    char *p = (char *)((size_t)__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
@@ -231,7 +231,7 @@ str __stos_lev1(const char *const s)
 {
     size_t len = strlen(s);
     void *__s = malloc(sizeof(__cstr) + len + 1);
-    char *p = (char *)(__s + sizeof(__cstr));
+    char *p = (char *)((size_t)__s + sizeof(__cstr));
 
     ((str)__s)->garbage = true;
     ((str)__s)->len = len;
@@ -244,7 +244,7 @@ str __stos_lev1(const char *const s)
 str __vtos_lev1(void *ptr) // create an empty str
 {
     void *__s = malloc(sizeof(__cstr) + 1);
-    char *p = (char *)(__s + sizeof(__cstr));
+    char *p = (char *)((size_t)__s + sizeof(__cstr));
 
     p[0] = '\0';
 
@@ -281,7 +281,7 @@ str __strNret(size_t num, ...)
     va_end(args);
 
     void *__s = malloc(sizeof(__cstr) + len + 1);
-    char *temp = (char *)(__s + sizeof(__cstr));
+    char *temp = (char *)((size_t)__s + sizeof(__cstr));
 
     va_start(args, num);
     str __tmpstr = va_arg(args, str);
@@ -374,7 +374,7 @@ str __cmdNret(size_t num, __cmdt cmd_, ...)
     pclose(__exec_cmd);
 
     void *__s = calloc(1, sizeof(__cstr) + __bytelen);
-    char *p = (char *)(__s + sizeof(__cstr));
+    char *p = (char *)((size_t)__s + sizeof(__cstr));
 
     ((str)__s)->garbage = false;
     ((str)__s)->len = __bytelen - 1;
